@@ -32,8 +32,13 @@ public class playerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //calculateTouchInput(); will uncomment this when testing mobile stuff
+#if UNITY_EDITOR
+        calculateDesktopInputs();
+#elif UNITY_WEBGL
         calculateMobileInput();
+#elif UNITY_IOS
+        calculateTouchInput();
+#endif
 
         //sets up the animator
         animationSetup();
@@ -45,6 +50,10 @@ public class playerMovement : MonoBehaviour
         {
             GameOver();
         }
+        if (health > 7)
+        {
+            health = 7;
+        }
     }
 
     void calculateDesktopInputs()
@@ -53,12 +62,6 @@ public class playerMovement : MonoBehaviour
         float y = Input.GetAxisRaw("Vertical");
 
         inputDirection = new Vector2(x, y).normalized;
-
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            attack();
-        }
-
     }
 
     void animationSetup()
@@ -88,10 +91,6 @@ public class playerMovement : MonoBehaviour
     public void GameOver()
     {
         Time.timeScale = 0;
-    }
-    public void attack()
-    {
-        anim.SetTrigger("Attack");
     }
 
     void calculateMobileInput()
@@ -167,6 +166,24 @@ public class playerMovement : MonoBehaviour
         {
             inputDirection = Vector2.zero;
             dpad.gameObject.SetActive(false);
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "RedBall")
+        {
+            health--;
+            Destroy(collision.gameObject);
+        }
+        if (collision.tag == "GreenBall")
+        {
+            health += 2;
+            Destroy(collision.gameObject);
+        }
+        if (collision.tag == "BlueBall")
+        {
+            moveSpeed *= 1.05f;
+            Destroy(collision.gameObject);
         }
     }
 }

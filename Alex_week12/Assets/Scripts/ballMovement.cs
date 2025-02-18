@@ -16,12 +16,4 @@ public class ballMovement : MonoBehaviour
     {
         transform.Translate(this.transform.right * moveSpeed * Time.deltaTime);
     }
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "Player")
-        {
-            GameObject.FindFirstObjectByType<playerMovement>().health--;
-            Destroy(gameObject);
-        }
-    }
 }
