@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class playerMovement : MonoBehaviour
 {
@@ -18,6 +21,12 @@ public class playerMovement : MonoBehaviour
 
     public int health;
 
+    PlayerInput _playerInput;
+    InputAction moveAction;
+
+    public GameObject gameOverOverlay, gameOverlay;
+    public TMP_Text timeSurvivedText, restartText, livesText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +36,10 @@ public class playerMovement : MonoBehaviour
 
         //makes the character look down by default
         lookDirection = new Vector2(0, -1);
+
+        //Gets access to the new movement system
+        _playerInput = GetComponent<PlayerInput>();
+        moveAction = _playerInput.actions.FindAction("Move");
     }
 
     // Update is called once per frame
@@ -54,14 +67,17 @@ public class playerMovement : MonoBehaviour
         {
             health = 7;
         }
+        livesText.text = "X " + health;
     }
 
     void calculateDesktopInputs()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
+        //float x = Input.GetAxisRaw("Horizontal");
+        //float y = Input.GetAxisRaw("Vertical");
 
-        inputDirection = new Vector2(x, y).normalized;
+        //inputDirection = new Vector2(x, y).normalized;
+
+        inputDirection = moveAction.ReadValue<Vector2>();
     }
 
     void animationSetup()
@@ -91,6 +107,17 @@ public class playerMovement : MonoBehaviour
     public void GameOver()
     {
         Time.timeScale = 0;
+        
+        GetComponent<SpriteRenderer>().enabled = false;
+        gameOverlay.SetActive(false);
+        gameOverOverlay.SetActive(true);
+        timeSurvivedText.text = "You survived for " + Time.time.ToString("f2") + " seconds!";
+        restartText.text = "Press R to restart!";
+        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 
     void calculateMobileInput()
@@ -131,43 +158,43 @@ public class playerMovement : MonoBehaviour
             dpad.gameObject.SetActive(false); 
         }
     }
-    void calculateTouchInput()
-    {
-        if (Input.touchCount > 0)
-        {
-            dpad.gameObject.SetActive(true);
-            theTouch = Input.GetTouch(0);
+    //void calculateTouchInput()
+    //{
+    //    if (Input.touchCount > 0)
+    //    {
+    //        dpad.gameObject.SetActive(true);
+    //        theTouch = Input.GetTouch(0);
 
-            if (theTouch.phase == TouchPhase.Began)
-            {
-                touchStart = theTouch.position;
-            }
-            else if (theTouch.phase == TouchPhase.Moved || theTouch.phase == TouchPhase.Ended)
-            {
-                touchEnd = theTouch.position;
+    //        if (theTouch.phase == TouchPhase.Began)
+    //        {
+    //            touchStart = theTouch.position;
+    //        }
+    //        else if (theTouch.phase == TouchPhase.Moved || theTouch.phase == TouchPhase.Ended)
+    //        {
+    //            touchEnd = theTouch.position;
 
-                float x = touchEnd.x - touchStart.x;
-                float y = touchEnd.y - touchStart.y;
+    //            float x = touchEnd.x - touchStart.x;
+    //            float y = touchEnd.y - touchStart.y;
 
-                //sets the input direction
-                inputDirection = new Vector2(x, y).normalized;
+    //            //sets the input direction
+    //            inputDirection = new Vector2(x, y).normalized;
 
-                if ((touchEnd - touchStart).magnitude > dpadRadius)
-                {
-                    dpad.transform.position = touchStart + (touchEnd - touchStart).normalized * dpadRadius;
-                }
-                else
-                {
-                    dpad.transform.position = touchEnd;
-                }
-            }
-        }
-        else
-        {
-            inputDirection = Vector2.zero;
-            dpad.gameObject.SetActive(false);
-        }
-    }
+    //            if ((touchEnd - touchStart).magnitude > dpadRadius)
+    //            {
+    //                dpad.transform.position = touchStart + (touchEnd - touchStart).normalized * dpadRadius;
+    //            }
+    //            else
+    //            {
+    //                dpad.transform.position = touchEnd;
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        inputDirection = Vector2.zero;
+    //        dpad.gameObject.SetActive(false);
+    //    }
+    //}
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "RedBall")
