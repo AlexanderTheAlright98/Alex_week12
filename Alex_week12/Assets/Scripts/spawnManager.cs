@@ -4,6 +4,7 @@ public class spawnManager : MonoBehaviour
 {
     public GameObject[] ballPrefabs;
     public GameObject[] spawnPoints;
+    public GameObject splineBalls;
     public float startDelay, spawnInterval;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -28,6 +29,7 @@ public class spawnManager : MonoBehaviour
         if (Time.time > 30)
         {
             Destroy(Instantiate(ballPrefabs[randomIndex], chosenSpawn2, Quaternion.Euler(0, 0, Random.Range(0, 360))), 3.5f);
+            splineBalls.SetActive(true);
         }
     }
 }

@@ -25,7 +25,8 @@ public class playerMovement : MonoBehaviour
     InputAction moveAction;
 
     public GameObject gameOverOverlay, gameOverlay;
-    public TMP_Text timeSurvivedText, restartText, livesText;
+    public TMP_Text timeSurvivedText, restartText, livesText, timerText;
+    public float xRange, yRange;
 
     // Start is called before the first frame update
     void Start()
@@ -68,6 +69,26 @@ public class playerMovement : MonoBehaviour
             health = 7;
         }
         livesText.text = "X " + health;
+        timerText.text = Time.time.ToString("f2");
+
+        #region Invisible Walls
+        if (transform.position.x > xRange)
+        {
+            transform.position = new Vector2(xRange, transform.position.y);
+        }
+        if (transform.position.x < -xRange)
+        {
+            transform.position = new Vector2(-xRange, transform.position.y);
+        }
+        if (transform.position.y > yRange)
+        {
+            transform.position = new Vector2(transform.position.x, yRange);
+        }
+        if (transform.position.y < -yRange)
+        {
+            transform.position = new Vector2(transform.position.x, -yRange);
+        }
+        #endregion
     }
 
     void calculateDesktopInputs()
